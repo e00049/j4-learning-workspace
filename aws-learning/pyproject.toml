@@ -1,0 +1,19 @@
+[project]
+name = "aws-ai-lab"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "e00049", email = "fjgftfrfhjyjuj@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.43.103",
+]
+
+[project.scripts]
+aws-ai-lab = "aws_ai_lab:main"
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"
