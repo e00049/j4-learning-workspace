@@ -1,0 +1,9 @@
+.env
+.env.*
+*.pem
+*service-account*.json
+.venv/
+__pycache__/
+.terraform/
+*.tfstate*
+*.tfvars
