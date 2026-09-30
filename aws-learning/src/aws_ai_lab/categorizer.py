@@ -6,6 +6,7 @@ Run from ai-learning/aws-learning:
 from __future__ import annotations
 
 import argparse
+import os
 import time
 from pathlib import Path
 from typing import Literal
@@ -36,7 +37,7 @@ PRICES_USD_PER_M = {
     "us.amazon.nova-lite-v1:0": (0.06, 0.24),
     "us.amazon.nova-pro-v1:0": (0.80, 3.20),
 }
-USD_TO_INR = 88.0  # approximate exchange rate; update as needed
+USD_TO_INR = float(os.getenv("USD_TO_INR", "95.92"))  # override: export USD_TO_INR=96.5
 
 # ---------------------------------------------------------------------------
 # The contract: what a valid answer MUST look like
