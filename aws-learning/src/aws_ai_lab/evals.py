@@ -2,7 +2,7 @@
 
 Run from ai-learning/aws-learning:
     uv run python -m aws_ai_lab.evals --runs 3 \
-        --models us.amazon.nova-micro-v1:0,us.amazon.nova-lite-v1:0,us.amazon.nova-2-lite-v1:0
+        --models amazon.nova-micro-v1:0,amazon.nova-lite-v1:0
 """
 from __future__ import annotations
 
