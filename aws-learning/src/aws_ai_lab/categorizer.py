@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import os
 import time
+from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
@@ -84,6 +85,12 @@ def strip_fences(text: str) -> str:
     return text.strip()
 
 
+@lru_cache(maxsize=1)
+def get_client():
+    """Create the Bedrock client ONCE and reuse it (connection + credentials cached)."""
+    return boto3.client("bedrock-runtime", region_name=REGION)
+
+
 def estimate_cost_inr(model_id: str, tokens_in: int, tokens_out: int) -> float | None:
     price = PRICES_USD_PER_M.get(model_id)
     if price is None:
@@ -96,7 +103,7 @@ def estimate_cost_inr(model_id: str, tokens_in: int, tokens_out: int) -> float |
 # Core: call Bedrock, validate, retry once if the output breaks the contract
 # ---------------------------------------------------------------------------
 def categorize(text: str, model_id: str = DEFAULT_MODEL, prompt_version: str = "v3") -> dict:
-    client = boto3.client("bedrock-runtime", region_name=REGION)
+    client = get_client()
     system_prompt = load_prompt(prompt_version)
     total_in = total_out = 0
     last_error: Exception | None = None
@@ -166,4 +173,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-    

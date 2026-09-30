@@ -1,0 +1,22 @@
+[
+  {
+    "id": "basic-4",
+    "input": "Swiggy 450, Uber 230, Netflix 649, Apollo Pharmacy 310",
+    "expected": [
+      {"merchant": "Swiggy", "amount": 450, "type": "expense", "category": "Food"},
+      {"merchant": "Uber", "amount": 230, "type": "expense", "category": "Transport"},
+      {"merchant": "Netflix", "amount": 649, "type": "expense", "category": "Entertainment"},
+      {"merchant": "Apollo Pharmacy", "amount": 310, "type": "expense", "category": "Health"}
+    ]
+  },
+  {
+    "id": "tricky-4",
+    "input": "Amazon 1299, BESCOM 1850, UPI-RAMESH 500, Zomato refund -200",
+    "expected": [
+      {"merchant": "Amazon", "amount": 1299, "type": "expense", "category": "Shopping"},
+      {"merchant": "BESCOM", "amount": 1850, "type": "expense", "category": "Bills"},
+      {"merchant": "Ramesh", "amount": 500, "type": "transfer", "category": "Transfer"},
+      {"merchant": "Zomato", "amount": -200, "type": "refund", "category": "Food"}
+    ]
+  }
+]
