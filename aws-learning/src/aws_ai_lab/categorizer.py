@@ -27,16 +27,16 @@ from pydantic import BaseModel, ValidationError, model_validator
 REPO_ROOT = Path(__file__).resolve().parents[3]          # .../ai-learning
 PROMPTS_DIR = REPO_ROOT / "shared" / "prompts"
 
-DEFAULT_MODEL = "us.amazon.nova-lite-v1:0"
+DEFAULT_MODEL = "amazon.nova-micro-v1:0"  # in-region us-east-1; eval winner
 REGION = "us-east-1"
 MAX_ATTEMPTS = 2
 
 # Approximate on-demand prices, USD per 1M tokens (input, output).
 # Verify on the Amazon Bedrock pricing page before trusting these numbers.
 PRICES_USD_PER_M = {
-    "us.amazon.nova-micro-v1:0": (0.035, 0.14),
-    "us.amazon.nova-lite-v1:0": (0.06, 0.24),
-    "us.amazon.nova-pro-v1:0": (0.80, 3.20),
+    "amazon.nova-micro-v1:0": (0.035, 0.14),
+    "amazon.nova-lite-v1:0": (0.06, 0.24),
+    "amazon.nova-pro-v1:0": (0.80, 3.20),
 }
 USD_TO_INR = float(os.getenv("USD_TO_INR", "95.92"))  # override: export USD_TO_INR=96.5
 
