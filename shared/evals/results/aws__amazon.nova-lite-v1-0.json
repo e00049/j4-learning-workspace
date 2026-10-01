@@ -1,0 +1,21 @@
+{
+  "provider": "aws",
+  "model": "amazon.nova-lite-v1:0",
+  "prompt": "v3",
+  "golden": "categorizer-golden-v1.json",
+  "runs": 3,
+  "cases": 2,
+  "calls": 6,
+  "txn_ok": 24,
+  "txn_total": 24,
+  "accuracy": 100.0,
+  "stable_cases": 2,
+  "consistency": 100.0,
+  "avg_ms": 1143,
+  "p50_ms": 1137,
+  "max_ms": 1220,
+  "cost_inr_total": 0.016782,
+  "cost_inr_per_call": 0.00279703,
+  "failures": [],
+  "timestamp": "2026-10-01T05:13:58+00:00"
+}

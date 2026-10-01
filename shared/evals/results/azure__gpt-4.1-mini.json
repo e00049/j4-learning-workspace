@@ -1,0 +1,21 @@
+{
+  "provider": "azure",
+  "model": "gpt-4.1-mini",
+  "prompt": "v3",
+  "golden": "categorizer-golden-v1.json",
+  "runs": 3,
+  "cases": 2,
+  "calls": 6,
+  "txn_ok": 24,
+  "txn_total": 24,
+  "accuracy": 100.0,
+  "stable_cases": 2,
+  "consistency": 100.0,
+  "avg_ms": 1996,
+  "p50_ms": 1784,
+  "max_ms": 3338,
+  "cost_inr_total": 0.104169,
+  "cost_inr_per_call": 0.01736152,
+  "failures": [],
+  "timestamp": "2026-10-01T05:14:14+00:00"
+}
