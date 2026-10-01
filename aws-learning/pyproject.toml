@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "boto3>=1.43.103",
+    "j4-common",
     "pydantic>=2.13.5",
 ]
 
@@ -18,3 +19,6 @@ aws-ai-lab = "aws_ai_lab:main"
 [build-system]
 requires = ["uv_build>=0.12.19,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv.sources]
+j4-common = { path = "../shared/j4-common", editable = true }

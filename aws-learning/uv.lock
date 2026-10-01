@@ -17,12 +17,14 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "boto3" },
+    { name = "j4-common" },
     { name = "pydantic" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "boto3", specifier = ">=1.43.103" },
+    { name = "j4-common", editable = "../shared/j4-common" },
     { name = "pydantic", specifier = ">=2.13.5" },
 ]
 
@@ -53,6 +55,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/3c/83/acbee6f2e3b1f02de
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8c/47/790ba88ec849d1e07b5866458b67e79b291164f3de7f23429b4dcb7e2ced/botocore-1.43.103-py3-none-any.whl", hash = "sha256:6a6a561a6de43845ae42bc7ff7e2c798742bfa277f5215398f9c15ed9b1bd67c", size = 15938608, upload-time = "2026-09-25T19:26:23.162Z" },
 ]
+
+[[package]]
+name = "j4-common"
+version = "0.1.0"
+source = { editable = "../shared/j4-common" }
+dependencies = [
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pydantic", specifier = ">=2.13" }]
 
 [[package]]
 name = "jmespath"

@@ -1,0 +1,12 @@
+"""Where the shared assets live, resolved from this file's location."""
+from pathlib import Path
+
+# .../ai-learning/shared/j4-common/src/j4_common/paths.py
+SHARED_DIR = Path(__file__).resolve().parents[3]     # .../ai-learning/shared
+REPO_ROOT = SHARED_DIR.parent                        # .../ai-learning
+PROMPTS_DIR = SHARED_DIR / "prompts"
+EVALS_DIR = SHARED_DIR / "evals"
+
+
+def load_prompt(version: str) -> str:
+    return (PROMPTS_DIR / f"categorizer-{version}.txt").read_text().strip()

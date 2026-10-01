@@ -1,0 +1,10 @@
+[project]
+name = "j4-common"
+version = "0.1.0"
+description = "Cloud-neutral contract, prompts, retry and cost helpers for the j4 AI learning path"
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.13"]
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"

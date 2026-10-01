@@ -1,0 +1,17 @@
+[project]
+name = "azure-ai-lab"
+version = "0.1.0"
+description = "Azure (Microsoft Foundry) adapter for the shared j4 categorizer"
+requires-python = ">=3.12"
+dependencies = [
+    "azure-identity>=1.19",
+    "openai>=3.0",
+    "j4-common",
+]
+
+[tool.uv.sources]
+j4-common = { path = "../shared/j4-common", editable = true }
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"
