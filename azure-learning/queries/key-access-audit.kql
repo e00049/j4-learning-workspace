@@ -1,0 +1,5 @@
+// Security: every attempt to list API keys (should be rare - keys are disabled)
+AzureDiagnostics
+| where TimeGenerated > ago(7d)
+| where _ResourceId has "aif-j4-ai-learning" and Category == "Audit" and OperationName == "ListKey"
+| project TimeGenerated, OperationName, ResultSignature, CallerIPAddress

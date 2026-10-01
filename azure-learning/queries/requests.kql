@@ -1,0 +1,8 @@
+// One row per model call: who, how long, how big, status
+AzureDiagnostics
+| where TimeGenerated > ago(24h)
+| where _ResourceId has "aif-j4-ai-learning" and Category == "RequestResponse"
+| extend p = parse_json(properties_s)
+| project TimeGenerated, OperationName, DurationMs, ResultSignature,
+          caller=tostring(p.objectId), reqBytes=toint(p.requestLength), respBytes=toint(p.responseLength)
+| order by TimeGenerated desc

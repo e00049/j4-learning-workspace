@@ -1,0 +1,6 @@
+// Token usage and per-call latency from platform metrics
+AzureMetrics
+| where TimeGenerated > ago(24h)
+| where _ResourceId has "aif-j4-ai-learning"
+| where MetricName in ("ModelRequests", "ProcessedPromptTokens", "GeneratedTokens", "Latency")
+| summarize calls=sum(Count), total=sum(Total), avg=round(avg(Average), 1) by MetricName
