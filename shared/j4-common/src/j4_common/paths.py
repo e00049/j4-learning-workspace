@@ -9,4 +9,9 @@ EVALS_DIR = SHARED_DIR / "evals"
 
 
 def load_prompt(version: str) -> str:
-    return (PROMPTS_DIR / f"categorizer-{version}.txt").read_text().strip()
+    """Load a prompt file. Templates (v4+) contain {SCHEMA}, filled from the Pydantic contract."""
+    text = (PROMPTS_DIR / f"categorizer-{version}.txt").read_text().strip()
+    if "{SCHEMA}" in text:
+        from j4_common.contract import schema_from_contract   # local import avoids a cycle
+        text = text.replace("{SCHEMA}", schema_from_contract())
+    return text

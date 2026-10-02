@@ -36,3 +36,26 @@ def strip_fences(text: str) -> str:
         text = text.split("\n", 1)[1] if "\n" in text else ""
         text = text.rsplit("```", 1)[0]
     return text.strip()
+
+
+# ---------------------------------------------------------------------------
+# Single source of truth: build the prompt's schema line FROM this contract,
+# so the prompt and the validator can never drift apart.
+# ---------------------------------------------------------------------------
+_TYPE_NAMES = {str: "string", float: "number", int: "number", bool: "boolean"}
+
+
+def _field_type(annotation) -> str:
+    from typing import get_args, get_origin
+
+    if get_origin(annotation) is Literal:
+        return '"' + "|".join(get_args(annotation)) + '"'
+    return _TYPE_NAMES.get(annotation, "string")
+
+
+def schema_from_contract() -> str:
+    """Compact schema text, e.g. {"transactions":[{"merchant":string,...}]}"""
+    fields = ",".join(
+        f'"{name}":{_field_type(info.annotation)}' for name, info in Transaction.model_fields.items()
+    )
+    return '{"transactions":[{' + fields + "}]}"
