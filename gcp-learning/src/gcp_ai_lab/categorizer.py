@@ -52,6 +52,7 @@ def vertex_call(model: str, system_prompt: str, user_text: str) -> ModelReply:
             # Turn it off so the comparison with Nova / gpt-4.1-mini is fair.
             thinking_config=types.ThinkingConfig(thinking_budget=0),
             labels=LABELS,
+            automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
         ),
     )
     usage = response.usage_metadata
