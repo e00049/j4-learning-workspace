@@ -1,0 +1,21 @@
+{
+  "provider": "gcp",
+  "model": "gemini-2.5-flash",
+  "prompt": "v3",
+  "golden": "categorizer-golden-v1.json",
+  "runs": 3,
+  "cases": 2,
+  "calls": 6,
+  "txn_ok": 24,
+  "txn_total": 24,
+  "accuracy": 100.0,
+  "stable_cases": 2,
+  "consistency": 100.0,
+  "avg_ms": 970,
+  "p50_ms": 980,
+  "max_ms": 1113,
+  "cost_inr_total": 0.145012,
+  "cost_inr_per_call": 0.02416864,
+  "failures": [],
+  "timestamp": "2026-10-02T09:17:42+00:00"
+}
