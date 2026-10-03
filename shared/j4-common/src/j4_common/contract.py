@@ -3,10 +3,12 @@ from typing import Literal
 
 from pydantic import BaseModel, model_validator
 
-TxnType = Literal["expense", "refund", "transfer"]
+CONTRACT_VERSION = "2"   # bump whenever the fields or allowed values change
+
+TxnType = Literal["expense", "refund", "transfer", "income"]
 Category = Literal[
-    "Food", "Transport", "Entertainment", "Health",
-    "Shopping", "Bills", "Transfer", "Other",
+    "Food", "Transport", "Entertainment", "Health", "Shopping", "Bills",
+    "Education", "Transfer", "Investment", "Income", "Cash", "Other",
 ]
 
 

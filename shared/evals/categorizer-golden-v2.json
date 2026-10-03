@@ -1,0 +1,490 @@
+[
+  {
+    "id": "upi-food-transport",
+    "input": "UPI/DR/412398765432/SWIGGY/YESB/swiggy.order@yes/Food order  1,250.00 DR\nUPI/DR/412398700011/ZOMATO LTD/HDFC/zomato@hdfcbank  389.00 DR\nUPI/DR/412398700234/UBER INDIA/ICIC/uber@icici  412.50 DR\nUPI/DR/412398700555/OLA/YESB/olacabs@ybl  268.00 DR\nPOS 4321XXXXXX1234 HP PETROL PUMP KORAMANGALA  2,000.00 DR",
+    "expected": [
+      {
+        "merchant": "Swiggy",
+        "amount": 1250,
+        "type": "expense",
+        "category": "Food"
+      },
+      {
+        "merchant": [
+          "Zomato",
+          "Zomato Ltd"
+        ],
+        "amount": 389,
+        "type": "expense",
+        "category": "Food"
+      },
+      {
+        "merchant": [
+          "Uber",
+          "Uber India"
+        ],
+        "amount": 412.5,
+        "type": "expense",
+        "category": "Transport"
+      },
+      {
+        "merchant": [
+          "Ola",
+          "Ola Cabs"
+        ],
+        "amount": 268,
+        "type": "expense",
+        "category": "Transport"
+      },
+      {
+        "merchant": [
+          "HP",
+          "HP Petrol Pump",
+          "HP Petrol",
+          "Hindustan Petroleum",
+          "HP Petrol Pump Koramangala"
+        ],
+        "amount": 2000,
+        "type": "expense",
+        "category": "Transport"
+      }
+    ]
+  },
+  {
+    "id": "bills-utilities",
+    "input": "NACH/DR/BESCOM ELECTRICITY/CA9876543  1,850.00 DR\nBBPS/DR/AIRTEL POSTPAID/9845XXXXXX  799.00 DR\nUPI/DR/412311112222/JIO PREPAID/JIOP/jio@paytm  349.00 DR\nNACH/DR/BWSSB WATER BILL/RR123456  450.00 DR\nUPI/DR/412311113333/ACT FIBERNET/ICIC/actfibernet@icici  1,178.82 DR",
+    "expected": [
+      {
+        "merchant": [
+          "BESCOM",
+          "BESCOM Electricity"
+        ],
+        "amount": 1850,
+        "type": "expense",
+        "category": "Bills"
+      },
+      {
+        "merchant": [
+          "Airtel",
+          "Airtel Postpaid"
+        ],
+        "amount": 799,
+        "type": "expense",
+        "category": "Bills"
+      },
+      {
+        "merchant": [
+          "Jio",
+          "Jio Prepaid",
+          "Reliance Jio"
+        ],
+        "amount": 349,
+        "type": "expense",
+        "category": "Bills"
+      },
+      {
+        "merchant": [
+          "BWSSB",
+          "BWSSB Water",
+          "BWSSB Water Bill"
+        ],
+        "amount": 450,
+        "type": "expense",
+        "category": "Bills"
+      },
+      {
+        "merchant": [
+          "ACT Fibernet",
+          "ACT"
+        ],
+        "amount": 1178.82,
+        "type": "expense",
+        "category": "Bills"
+      }
+    ]
+  },
+  {
+    "id": "shopping-mixed",
+    "input": "UPI/DR/412322223333/AMAZON PAY/YESB/amazonpay@apl  2,499.00 DR\nPOS 4321XXXXXX1234 MYNTRA DESIGNS  1,799.00 DR\nUPI/DR/412322224444/FLIPKART INTERNET/AXIS/fkrt@axisbank  15,999.00 DR\nUPI/CR/412322225555/AMAZON PAY/YESB/refund  2,499.00 CR\nPOS 4321XXXXXX1234 DECATHLON SPORTS BLR  2,899.00 DR",
+    "expected": [
+      {
+        "merchant": [
+          "Amazon",
+          "Amazon Pay"
+        ],
+        "amount": 2499,
+        "type": "expense",
+        "category": "Shopping"
+      },
+      {
+        "merchant": [
+          "Myntra",
+          "Myntra Designs"
+        ],
+        "amount": 1799,
+        "type": "expense",
+        "category": "Shopping"
+      },
+      {
+        "merchant": [
+          "Flipkart",
+          "Flipkart Internet"
+        ],
+        "amount": 15999,
+        "type": "expense",
+        "category": "Shopping"
+      },
+      {
+        "merchant": [
+          "Amazon",
+          "Amazon Pay"
+        ],
+        "amount": -2499,
+        "type": "refund",
+        "category": "Shopping"
+      },
+      {
+        "merchant": [
+          "Decathlon",
+          "Decathlon Sports"
+        ],
+        "amount": 2899,
+        "type": "expense",
+        "category": "Shopping"
+      }
+    ]
+  },
+  {
+    "id": "health-entertainment",
+    "input": "UPI/DR/412333334444/APOLLO PHARMACY/HDFC/apollo@hdfcbank  640.00 DR\nPOS 4321XXXXXX1234 PRACTO TECHNOLOGIES  500.00 DR\nNACH/DR/NETFLIX COM/SI123456  649.00 DR\nUPI/DR/412333335555/BOOKMYSHOW/ICIC/bms@icici  720.00 DR\nUPI/DR/412333336666/SPOTIFY INDIA/YESB/spotify@yes  119.00 DR",
+    "expected": [
+      {
+        "merchant": "Apollo Pharmacy",
+        "amount": 640,
+        "type": "expense",
+        "category": "Health"
+      },
+      {
+        "merchant": [
+          "Practo",
+          "Practo Technologies"
+        ],
+        "amount": 500,
+        "type": "expense",
+        "category": "Health"
+      },
+      {
+        "merchant": [
+          "Netflix",
+          "Netflix.com",
+          "Netflix Com"
+        ],
+        "amount": 649,
+        "type": "expense",
+        "category": "Entertainment"
+      },
+      {
+        "merchant": [
+          "BookMyShow",
+          "Book My Show"
+        ],
+        "amount": 720,
+        "type": "expense",
+        "category": "Entertainment"
+      },
+      {
+        "merchant": [
+          "Spotify",
+          "Spotify India"
+        ],
+        "amount": 119,
+        "type": "expense",
+        "category": "Entertainment"
+      }
+    ]
+  },
+  {
+    "id": "transfers-people",
+    "input": "UPI/DR/412355556666/RAMESH KUMAR/SBIN/ramesh.k@oksbi/rent share  5,000.00 DR\nIMPS/DR/412355557777/PRIYA S/HDFC/dinner split  850.00 DR\nUPI/CR/412355558888/ANAND R/ICIC/anand@okicici/return  1,200.00 CR\nIMPS/DR/412355559999/KARTHIK M/HDFC/gift  2,000.00 DR\nUPI/DR/412355550000/SURESH BABU/CNRB/suresh@okaxis  300.00 DR",
+    "expected": [
+      {
+        "merchant": "Ramesh Kumar",
+        "amount": 5000,
+        "type": "transfer",
+        "category": "Transfer"
+      },
+      {
+        "merchant": "Priya S",
+        "amount": 850,
+        "type": "transfer",
+        "category": "Transfer"
+      },
+      {
+        "merchant": "Anand R",
+        "amount": -1200,
+        "type": "transfer",
+        "category": "Transfer"
+      },
+      {
+        "merchant": "Karthik M",
+        "amount": 2000,
+        "type": "transfer",
+        "category": "Transfer"
+      },
+      {
+        "merchant": "Suresh Babu",
+        "amount": 300,
+        "type": "transfer",
+        "category": "Transfer"
+      }
+    ]
+  },
+  {
+    "id": "income",
+    "input": "NEFT/CR/SALARY OCT 2026/ACME TECHNOLOGIES PVT LTD  85,000.00 CR\nINT.PD:SB A/C 0123 QTR INTEREST  312.40 CR\nUPI/CR/412366667777/CRED/YESB/cashback  150.00 CR\nNEFT/CR/UPWORK ESCROW/freelance  25,000.00 CR\nIMPS/CR/DIVIDEND/INFOSYS LTD  1,140.00 CR",
+    "expected": [
+      {
+        "merchant": [
+          "Acme Technologies",
+          "Acme Technologies Pvt Ltd",
+          "Acme"
+        ],
+        "amount": -85000,
+        "type": "income",
+        "category": "Income"
+      },
+      {
+        "merchant": [
+          "Interest",
+          "Bank Interest",
+          "Savings Interest",
+          "SB Interest",
+          "Quarterly Interest",
+          "Qtr Interest",
+          "SB A/C Interest"
+        ],
+        "amount": -312.4,
+        "type": "income",
+        "category": "Income"
+      },
+      {
+        "merchant": "CRED",
+        "amount": -150,
+        "type": "income",
+        "category": "Income"
+      },
+      {
+        "merchant": [
+          "Upwork",
+          "Upwork Escrow"
+        ],
+        "amount": -25000,
+        "type": "income",
+        "category": "Income"
+      },
+      {
+        "merchant": [
+          "Infosys",
+          "Infosys Ltd"
+        ],
+        "amount": -1140,
+        "type": "income",
+        "category": "Income"
+      }
+    ]
+  },
+  {
+    "id": "cash-investment",
+    "input": "ATM/WDL/SBI ATM HSR LAYOUT  5,000.00 DR\nATM/WDL/HDFC ATM KORAMANGALA  2,000.00 DR\nACH/DR/ZERODHA BROKING/SIP  5,000.00 DR\nNACH/DR/GROWW MF SIP/GRW12345  2,500.00 DR\nUPI/DR/412377778888/PPF DEPOSIT/SBIN/ppf@sbi  1,500.00 DR",
+    "expected": [
+      {
+        "merchant": "ATM",
+        "amount": 5000,
+        "type": "expense",
+        "category": "Cash"
+      },
+      {
+        "merchant": "ATM",
+        "amount": 2000,
+        "type": "expense",
+        "category": "Cash"
+      },
+      {
+        "merchant": [
+          "Zerodha",
+          "Zerodha Broking"
+        ],
+        "amount": 5000,
+        "type": "transfer",
+        "category": "Investment"
+      },
+      {
+        "merchant": [
+          "Groww",
+          "Groww MF"
+        ],
+        "amount": 2500,
+        "type": "transfer",
+        "category": "Investment"
+      },
+      {
+        "merchant": [
+          "PPF",
+          "PPF Deposit",
+          "SBI PPF"
+        ],
+        "amount": 1500,
+        "type": "transfer",
+        "category": "Investment"
+      }
+    ]
+  },
+  {
+    "id": "education-emi",
+    "input": "NEFT/DR/DPS SCHOOL FEES/TERM2  24,500.00 DR\nUPI/DR/412388889999/UDEMY INDIA/ICIC/udemy@icici  499.00 DR\nNACH/DR/HDFC BANK LOAN EMI/LN778899  12,340.00 DR\nNACH/DR/BAJAJ FINANCE EMI/BF445566  3,299.00 DR\nUPI/DR/412388880000/COURSERA/YESB/coursera@yes  3,999.00 DR",
+    "expected": [
+      {
+        "merchant": [
+          "DPS",
+          "DPS School",
+          "Delhi Public School"
+        ],
+        "amount": 24500,
+        "type": "expense",
+        "category": "Education"
+      },
+      {
+        "merchant": [
+          "Udemy",
+          "Udemy India"
+        ],
+        "amount": 499,
+        "type": "expense",
+        "category": "Education"
+      },
+      {
+        "merchant": [
+          "HDFC Bank",
+          "HDFC",
+          "HDFC Bank Loan"
+        ],
+        "amount": 12340,
+        "type": "expense",
+        "category": "Bills"
+      },
+      {
+        "merchant": [
+          "Bajaj Finance",
+          "Bajaj"
+        ],
+        "amount": 3299,
+        "type": "expense",
+        "category": "Bills"
+      },
+      {
+        "merchant": "Coursera",
+        "amount": 3999,
+        "type": "expense",
+        "category": "Education"
+      }
+    ]
+  },
+  {
+    "id": "travel-card",
+    "input": "CC PAYMENT/HDFC CREDIT CARD/XX1234  18,250.00 DR\nSMS CHARGES Q2 FY26-27  17.70 DR\nUPI/DR/412399990000/IRCTC/SBIN/irctc@sbi  1,435.00 DR\nUPI/DR/412399991111/RAPIDO/YESB/rapido@yes  98.00 DR\nUPI/DR/412399992222/PAYTM FASTAG RECHARGE/PYTM/fastag@paytm  500.00 DR",
+    "expected": [
+      {
+        "merchant": [
+          "HDFC Credit Card",
+          "HDFC Bank Credit Card",
+          "HDFC",
+          "HDFC Bank"
+        ],
+        "amount": 18250,
+        "type": "transfer",
+        "category": "Transfer"
+      },
+      {
+        "merchant": [
+          "SMS Charges",
+          "Bank Charges",
+          "Bank",
+          "SMS Charges Q2"
+        ],
+        "amount": 17.7,
+        "type": "expense",
+        "category": "Bills"
+      },
+      {
+        "merchant": "IRCTC",
+        "amount": 1435,
+        "type": "expense",
+        "category": "Transport"
+      },
+      {
+        "merchant": "Rapido",
+        "amount": 98,
+        "type": "expense",
+        "category": "Transport"
+      },
+      {
+        "merchant": [
+          "FASTag",
+          "Paytm FASTag",
+          "Paytm",
+          "Paytm FASTag Recharge",
+          "FASTag Recharge"
+        ],
+        "amount": 500,
+        "type": "expense",
+        "category": "Transport"
+      }
+    ]
+  },
+  {
+    "id": "refunds-unknown",
+    "input": "UPI/CR/412300001111/SWIGGY/YESB/refund  245.00 CR\nUPI/CR/412300002222/UBER INDIA/ICIC/refund  112.00 CR\nUPI/DR/412300003333/SHRI GANESH TRADERS/KKBK/sgt@kotak  760.00 DR\nPOS 4321XXXXXX1234 CAFE COFFEE DAY INDIRANAGAR  380.00 DR\nPOS 4321XXXXXX1234 STARBUCKS COFFEE BLR  455.00 DR",
+    "expected": [
+      {
+        "merchant": "Swiggy",
+        "amount": -245,
+        "type": "refund",
+        "category": "Food"
+      },
+      {
+        "merchant": [
+          "Uber",
+          "Uber India"
+        ],
+        "amount": -112,
+        "type": "refund",
+        "category": "Transport"
+      },
+      {
+        "merchant": "Shri Ganesh Traders",
+        "amount": 760,
+        "type": "expense",
+        "category": "Other"
+      },
+      {
+        "merchant": [
+          "Cafe Coffee Day",
+          "CCD",
+          "Cafe Coffee Day Indiranagar"
+        ],
+        "amount": 380,
+        "type": "expense",
+        "category": "Food"
+      },
+      {
+        "merchant": [
+          "Starbucks",
+          "Starbucks Coffee"
+        ],
+        "amount": 455,
+        "type": "expense",
+        "category": "Food"
+      }
+    ]
+  }
+]

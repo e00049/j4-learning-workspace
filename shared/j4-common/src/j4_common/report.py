@@ -31,9 +31,9 @@ def main() -> None:
               f"{r['p50_ms'] or 0:>7} {per_k:>11}  {r['prompt']:<6} {r['timestamp'][:19]:<20}")
 
     # Fairness check: only compare like with like.
-    setups = {(r["prompt"], r["golden"], r["runs"]) for r in rows}
+    setups = {(r["prompt"], r["golden"], r["runs"], r.get("contract", "1")) for r in rows}
     if len(setups) > 1:
-        print("\n⚠️  NOT a fair comparison - results use different setups (prompt, golden, runs):")
+        print("\n⚠️  NOT a fair comparison - results use different setups (prompt, golden, runs, contract):")
         for s in sorted(setups):
             print(f"   {s}")
 
@@ -50,6 +50,17 @@ def main() -> None:
                   f"for the same result")
     else:
         print("\n🚫 No model passed 100% accuracy and consistency.")
+        scored = [r for r in rows if r["cost_inr_per_call"] is not None]
+        if scored:
+            top = max(scored, key=lambda r: (r["accuracy"], r["consistency"], -r["cost_inr_per_call"]))
+            print(f"   Best so far: {CLOUD_LABEL.get(top['provider'])} {top['model']} "
+                  f"({top['accuracy']}% accuracy, {top['consistency']}% consistency)")
+
+    weak = {r["model"]: r.get("field_errors", {}) for r in rows if any(r.get("field_errors", {}).values())}
+    if weak:
+        print("\n🔎 Errors by field (where models struggle):")
+        for model, errs in weak.items():
+            print(f"   {model:<26} " + ", ".join(f"{f}={n}" for f, n in errs.items() if n))
 
 
 if __name__ == "__main__":

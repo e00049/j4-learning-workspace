@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
+from j4_common.contract import CONTRACT_VERSION
 from j4_common.paths import EVALS_DIR
 from j4_common.runner import ContractError
 
@@ -24,9 +25,30 @@ RESULTS_DIR = EVALS_DIR / "results"
 FIELDS = ("merchant", "amount", "type", "category")
 
 
+def _merchants(value) -> list[str]:
+    """Golden merchants may list several acceptable spellings (messy statement lines)."""
+    names = value if isinstance(value, list) else [value]
+    return [n.strip().lower() for n in names]
+
+
+def field_problems(exp: dict, act: dict) -> list[tuple[str, object, object]]:
+    """(field, expected, got) for every field that does not match.
+    merchant: case-insensitive, any listed alias is fine. amount: within 1 paisa.
+    type / category: strict - these drive the business numbers."""
+    problems = []
+    if act["merchant"].strip().lower() not in _merchants(exp["merchant"]):
+        problems.append(("merchant", exp["merchant"], act["merchant"]))
+    if abs(float(exp["amount"]) - float(act["amount"])) > 0.01:
+        problems.append(("amount", float(exp["amount"]), float(act["amount"])))
+    for field in ("type", "category"):
+        if exp[field] != act[field]:
+            problems.append((field, exp[field], act[field]))
+    return problems
+
+
 def normalise(txn: dict) -> tuple:
-    """Make comparison fair: merchant is case-insensitive, amount is a float."""
-    return (txn["merchant"].strip().lower(), float(txn["amount"]), txn["type"], txn["category"])
+    """Fingerprint of a model answer, used for the consistency check."""
+    return (txn["merchant"].strip().lower(), round(float(txn["amount"]), 2), txn["type"], txn["category"])
 
 
 def mismatches(expected: list[dict], actual: list[dict]) -> list[str]:
@@ -34,15 +56,15 @@ def mismatches(expected: list[dict], actual: list[dict]) -> list[str]:
     if len(expected) != len(actual):
         problems.append(f"expected {len(expected)} transactions, got {len(actual)}")
     for i, (exp, act) in enumerate(zip(expected, actual), start=1):
-        for field, e, a in zip(FIELDS, normalise(exp), normalise(act)):
-            if e != a:
-                problems.append(f"txn {i} {field}: expected {e!r}, got {a!r}")
+        for field, e, a in field_problems(exp, act):
+            problems.append(f"txn {i} {field}: expected {e!r}, got {a!r}")
     return problems
 
 
 def run_model(categorize_fn: Callable, model: str, cases: list[dict], runs: int, prompt: str) -> dict:
     s = {"txn_total": 0, "txn_ok": 0, "calls": 0, "cost": 0.0, "cost_known": True,
-         "latencies": [], "failures": [], "outputs": defaultdict(set)}
+         "latencies": [], "failures": [], "outputs": defaultdict(set),
+         "field_errors": {f: 0 for f in FIELDS}}
     for run in range(1, runs + 1):
         for case in cases:
             expected = case["expected"]
@@ -55,7 +77,11 @@ def run_model(categorize_fn: Callable, model: str, cases: list[dict], runs: int,
                 s["outputs"][case["id"]].add("INVALID")
                 continue
             actual = [t.model_dump() for t in out["result"].transactions]
-            s["txn_ok"] += sum(normalise(e) == normalise(a) for e, a in zip(expected, actual))
+            for e, a in zip(expected, actual):
+                problems = field_problems(e, a)
+                s["txn_ok"] += not problems
+                for field, _, _ in problems:
+                    s["field_errors"][field] += 1
             s["outputs"][case["id"]].add(tuple(normalise(a) for a in actual))
             s["latencies"].append(out["latency_ms"])
             if out["cost_inr"] is None:
@@ -72,6 +98,7 @@ def summarise(provider: str, model: str, s: dict, n_cases: int, args) -> dict:
         "provider": provider,
         "model": model,
         "prompt": args.prompt,
+        "contract": CONTRACT_VERSION,
         "golden": args.golden.name,
         "runs": args.runs,
         "cases": n_cases,
@@ -86,6 +113,7 @@ def summarise(provider: str, model: str, s: dict, n_cases: int, args) -> dict:
         "max_ms": max(lat) if lat else None,
         "cost_inr_total": round(s["cost"], 6) if s["cost_known"] else None,
         "cost_inr_per_call": round(s["cost"] / s["calls"], 8) if s["cost_known"] and s["calls"] else None,
+        "field_errors": s["field_errors"],
         "failures": s["failures"][:20],
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
@@ -139,6 +167,10 @@ def run_cli(
               f"{r['avg_ms'] or 0:>7} {r['p50_ms'] or 0:>7} {per_k:>11}")
         gate_failed |= r["accuracy"] < args.min_accuracy
 
+    for r in summaries:
+        errs = {f: n for f, n in r["field_errors"].items() if n}
+        if errs:
+            print(f"\n🔎 {r['model']} errors by field: " + ", ".join(f"{f}={n}" for f, n in errs.items()))
     for r in summaries:
         if r["failures"]:
             print(f"\n❌ {r['model']}")
