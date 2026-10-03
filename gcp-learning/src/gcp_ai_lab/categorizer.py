@@ -13,7 +13,9 @@ from google import genai
 from google.auth.exceptions import DefaultCredentialsError, RefreshError
 from google.genai import errors, types
 
-from j4_common import REPO_ROOT, ContractError, ModelReply, categorize_with, print_result
+from j4_common import (
+    REPO_ROOT, ContractError, ModelReply, categorize_with, print_result, response_json_schema,
+)
 
 __all__ = ["DEFAULT_MODEL", "REPO_ROOT", "categorize"]
 
@@ -47,7 +49,10 @@ def vertex_call(model: str, system_prompt: str, user_text: str) -> ModelReply:
         config=types.GenerateContentConfig(
             system_instruction=system_prompt,
             temperature=0,
-            max_output_tokens=400,
+            max_output_tokens=1000,
+            # Structured output: Gemini must return JSON matching this schema (generated from Pydantic).
+            response_mime_type="application/json",
+            response_json_schema=response_json_schema(),
             # 2.5 models can "think" before answering; thinking tokens are billed as output.
             # Turn it off so the comparison with Nova / gpt-4.1-mini is fair.
             thinking_config=types.ThinkingConfig(thinking_budget=0),

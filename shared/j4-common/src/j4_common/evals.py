@@ -64,7 +64,7 @@ def mismatches(expected: list[dict], actual: list[dict]) -> list[str]:
 def run_model(categorize_fn: Callable, model: str, cases: list[dict], runs: int, prompt: str) -> dict:
     s = {"txn_total": 0, "txn_ok": 0, "calls": 0, "cost": 0.0, "cost_known": True,
          "latencies": [], "failures": [], "outputs": defaultdict(set),
-         "field_errors": {f: 0 for f in FIELDS}}
+         "field_errors": {f: 0 for f in FIELDS}, "amount_fixes": 0, "retries": 0}
     for run in range(1, runs + 1):
         for case in cases:
             expected = case["expected"]
@@ -76,6 +76,8 @@ def run_model(categorize_fn: Callable, model: str, cases: list[dict], runs: int,
                 s["failures"].append(f"run {run} · {case['id']}: invalid output (contract)")
                 s["outputs"][case["id"]].add("INVALID")
                 continue
+            s["amount_fixes"] += out.get("amount_fixes", 0)
+            s["retries"] += out["attempts"] - 1
             actual = [t.model_dump() for t in out["result"].transactions]
             for e, a in zip(expected, actual):
                 problems = field_problems(e, a)
@@ -114,6 +116,8 @@ def summarise(provider: str, model: str, s: dict, n_cases: int, args) -> dict:
         "cost_inr_total": round(s["cost"], 6) if s["cost_known"] else None,
         "cost_inr_per_call": round(s["cost"] / s["calls"], 8) if s["cost_known"] and s["calls"] else None,
         "field_errors": s["field_errors"],
+        "amount_fixes": s["amount_fixes"],
+        "retries": s["retries"],
         "failures": s["failures"][:20],
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
@@ -167,6 +171,8 @@ def run_cli(
               f"{r['avg_ms'] or 0:>7} {r['p50_ms'] or 0:>7} {per_k:>11}")
         gate_failed |= r["accuracy"] < args.min_accuracy
 
+    for r in summaries:
+        print(f"\n🛡️  {r['model']}: retries={r['retries']}, amounts corrected by code={r['amount_fixes']}")
     for r in summaries:
         errs = {f: n for f, n in r["field_errors"].items() if n}
         if errs:

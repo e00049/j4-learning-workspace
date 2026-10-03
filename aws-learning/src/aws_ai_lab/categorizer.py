@@ -6,6 +6,7 @@ Run from ai-learning/aws-learning:
 from __future__ import annotations
 
 import argparse
+import json
 from functools import lru_cache
 
 import boto3
@@ -16,7 +17,9 @@ from botocore.exceptions import (
     UnauthorizedSSOTokenError,
 )
 
-from j4_common import REPO_ROOT, ContractError, ModelReply, categorize_with, print_result
+from j4_common import (
+    REPO_ROOT, ContractError, ModelReply, categorize_with, print_result, response_json_schema,
+)
 
 __all__ = ["DEFAULT_MODEL", "REPO_ROOT", "categorize"]   # REPO_ROOT kept for evals.py
 
@@ -37,16 +40,41 @@ def get_client():
     return boto3.client("bedrock-runtime", region_name=REGION)
 
 
+TOOL_NAME = "record_transactions"
+TOOL_CONFIG_BASE = {
+    "tools": [{
+        "toolSpec": {
+            "name": TOOL_NAME,
+            "description": "Record the categorized transactions, one item per input line, in order.",
+            "inputSchema": {"json": response_json_schema()},   # generated from the Pydantic contract
+        }
+    }]
+}
+
+
 def bedrock_call(model: str, system_prompt: str, user_text: str) -> ModelReply:
-    """The ONLY AWS-specific part: send one request to Bedrock."""
-    response = get_client().converse(
+    """The ONLY AWS-specific part. Structured output on Bedrock = a FORCED tool call:
+    the model must fill the tool's JSON schema instead of writing free text."""
+    request = dict(
         modelId=model,
         system=[{"text": system_prompt}],
         messages=[{"role": "user", "content": [{"text": user_text}]}],
-        inferenceConfig={"maxTokens": 400, "temperature": 0},
+        inferenceConfig={"maxTokens": 1000, "temperature": 0},
     )
+    try:
+        response = get_client().converse(
+            **request, toolConfig={**TOOL_CONFIG_BASE, "toolChoice": {"tool": {"name": TOOL_NAME}}})
+    except ClientError as err:
+        if "toolChoice" not in str(err):
+            raise
+        # Some models only support "any tool" - with a single tool that is equivalent.
+        response = get_client().converse(**request, toolConfig={**TOOL_CONFIG_BASE, "toolChoice": {"any": {}}})
+
+    blocks = response["output"]["message"]["content"]
+    tool_inputs = [b["toolUse"]["input"] for b in blocks if "toolUse" in b]
+    text = json.dumps(tool_inputs[0]) if tool_inputs else "".join(b.get("text", "") for b in blocks)
     return ModelReply(
-        text=response["output"]["message"]["content"][0]["text"],
+        text=text,
         input_tokens=response["usage"]["inputTokens"],
         output_tokens=response["usage"]["outputTokens"],
     )

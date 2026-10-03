@@ -7,6 +7,7 @@ from typing import Callable
 
 from pydantic import ValidationError
 
+from j4_common.amounts import enforce_amounts
 from j4_common.contract import CategorizeResult, strip_fences
 from j4_common.cost import estimate_cost_inr
 from j4_common.paths import load_prompt
@@ -64,9 +65,12 @@ def categorize_with(
     else:
         raise ContractError(f"Output failed validation after {max_attempts} attempts:\n{last_error}")
 
+    amount_fixes = enforce_amounts(text, result)   # code wins for numbers
+
     return {
         "result": result,
         "attempts": attempt,
+        "amount_fixes": amount_fixes,
         "input_tokens": total_in,
         "output_tokens": total_out,
         "latency_ms": round((time.perf_counter() - started) * 1000),
@@ -82,3 +86,5 @@ def print_result(out: dict) -> None:
         f"\n📊 tokens in/out: {out['input_tokens']}/{out['output_tokens']} | "
         f"latency: {out['latency_ms']} ms | attempts: {out['attempts']} | cost: {cost}"
     )
+    if out.get("amount_fixes"):
+        print(f"🔢 code corrected {out['amount_fixes']} amount(s) the model got wrong")

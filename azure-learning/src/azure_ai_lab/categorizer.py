@@ -13,7 +13,9 @@ from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import CredentialUnavailableError, DefaultAzureCredential, get_bearer_token_provider
 from openai import APIError, AuthenticationError, NotFoundError, OpenAI, PermissionDeniedError
 
-from j4_common import REPO_ROOT, ContractError, ModelReply, categorize_with, print_result
+from j4_common import (
+    REPO_ROOT, ContractError, ModelReply, categorize_with, print_result, response_json_schema,
+)
 
 __all__ = ["DEFAULT_MODEL", "REPO_ROOT", "categorize"]
 
@@ -47,7 +49,12 @@ def azure_call(model: str, system_prompt: str, user_text: str) -> ModelReply:
             {"role": "user", "content": user_text},
         ],
         temperature=0,
-        max_tokens=400,
+        max_tokens=1000,
+        # Structured output: the service enforces this JSON schema (generated from Pydantic).
+        response_format={
+            "type": "json_schema",
+            "json_schema": {"name": "categorize_result", "strict": True, "schema": response_json_schema()},
+        },
     )
     return ModelReply(
         text=response.choices[0].message.content or "",

@@ -61,3 +61,26 @@ def schema_from_contract() -> str:
         f'"{name}":{_field_type(info.annotation)}' for name, info in Transaction.model_fields.items()
     )
     return '{"transactions":[{' + fields + "}]}"
+
+
+def response_json_schema() -> dict:
+    """JSON Schema for CategorizeResult that all three clouds accept for native
+    structured output: $refs inlined, titles removed, every object closed
+    (additionalProperties: false) and every property required (Azure strict mode)."""
+    raw = CategorizeResult.model_json_schema()
+    defs = raw.pop("$defs", {})
+
+    def clean(node):
+        if isinstance(node, dict):
+            if "$ref" in node:
+                return clean(defs[node["$ref"].split("/")[-1]])
+            out = {k: clean(v) for k, v in node.items() if k not in ("title", "description")}
+            if out.get("type") == "object":
+                out["additionalProperties"] = False
+                out["required"] = list(out.get("properties", {}))
+            return out
+        if isinstance(node, list):
+            return [clean(v) for v in node]
+        return node
+
+    return clean(raw)
