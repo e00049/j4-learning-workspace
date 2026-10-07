@@ -10,6 +10,10 @@ def df():
 
 @mcp.tool()
 def get_total_spend() -> int:
+    """Total spend in INR for the user's current statement (September 2026). Use this for any 'total spend' or 'this month' question."""
+
+@mcp.tool()
+def get_total_spend() -> int:
     """Total spend in INR for September 2026."""
     return int(df()["amount_inr"].sum())
 
