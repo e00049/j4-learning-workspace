@@ -8,14 +8,6 @@ mcp = FastMCP("wallettracker")
 def df():
     return pd.read_csv(CSV)
 
-@mcp.tool()
-def get_total_spend() -> int:
-    """Total spend in INR for the user's current statement (September 2026). Use this for any 'total spend' or 'this month' question."""
-
-@mcp.tool()
-def get_total_spend() -> int:
-    """Total spend in INR for September 2026."""
-    return int(df()["amount_inr"].sum())
 
 @mcp.tool()
 def spend_by_category(exclude: list[str] = []) -> dict:
@@ -31,6 +23,11 @@ def merchant_spend(merchants: list[str]) -> dict:
     out = {m: int(d.loc[d["merchant"] == m, "amount_inr"].sum()) for m in merchants}
     out["total"] = sum(out.values())
     return out
+
+@mcp.tool()
+def get_total_spend() -> int:
+    """Total spend in INR for the user's current statement (September 2026). Use this for any 'total spend' or 'this month' question."""
+    return int(df()["amount_inr"].sum())
 
 if __name__ == "__main__":
     mcp.run()
