@@ -1,9 +1,14 @@
+import os
 from pathlib import Path
 import pandas as pd
 from mcp.server.fastmcp import FastMCP
 
 CSV = Path(__file__).resolve().parent.parent / "data" / "transactions_sep2026.csv"
-mcp = FastMCP("wallettracker")
+TRANSPORT = os.environ.get("MCP_TRANSPORT", "stdio")      # stdio (default) or streamable-http
+mcp = FastMCP("wallettracker",
+              host="0.0.0.0",
+              port=int(os.environ.get("PORT", "8000")),     # Cloud Run sets PORT
+              stateless_http=True)                          # no session state, scales cleanly
 
 def df():
     return pd.read_csv(CSV)
@@ -30,5 +35,4 @@ def get_total_spend() -> int:
     return int(df()["amount_inr"].sum())
 
 if __name__ == "__main__":
-    mcp.run()
-
+    mcp.run(transport=TRANSPORT)
