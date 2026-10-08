@@ -5,10 +5,16 @@ from mcp.server.fastmcp import FastMCP
 
 CSV = Path(__file__).resolve().parent.parent / "data" / "transactions_sep2026.csv"
 TRANSPORT = os.environ.get("MCP_TRANSPORT", "stdio")      # stdio (default) or streamable-http
+# mcp = FastMCP("wallettracker",
+#               host="0.0.0.0",
+#               port=int(os.environ.get("PORT", "8000")),     # Cloud Run sets PORT
+#               stateless_http=True)                          # no session state, scales cleanly
+
 mcp = FastMCP("wallettracker",
               host="0.0.0.0",
-              port=int(os.environ.get("PORT", "8000")),     # Cloud Run sets PORT
-              stateless_http=True)                          # no session state, scales cleanly
+              port=int(os.environ.get("PORT", "8000")),
+              stateless_http=True,
+              json_response=os.environ.get("MCP_JSON_RESPONSE") == "1")   # Lambda: plain JSON
 
 def df():
     return pd.read_csv(CSV)
