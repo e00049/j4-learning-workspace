@@ -1,0 +1,39 @@
+date,merchant,category,amount_inr,payment_mode
+2026-09-01,House Rent - Ramesh,Rent,18000,NEFT
+2026-09-02,Swiggy,Food,450,UPI
+2026-09-02,Uber,Transport,268,UPI
+2026-09-03,BESCOM Electricity,Bills,1850,UPI
+2026-09-04,Zomato,Food,389,UPI
+2026-09-05,ACT Fibernet,Bills,1179,UPI
+2026-09-05,Airtel Postpaid,Bills,799,Card
+2026-09-06,BigBasket,Groceries,1840,UPI
+2026-09-06,Swiggy,Food,620,UPI
+2026-09-07,Netflix,Entertainment,649,Card
+2026-09-08,Ola,Transport,312,UPI
+2026-09-09,Zomato,Food,540,UPI
+2026-09-10,Groww SIP,Investment,5000,NACH
+2026-09-11,Rapido,Transport,98,UPI
+2026-09-11,Swiggy,Food,310,UPI
+2026-09-12,Apollo Pharmacy,Health,640,UPI
+2026-09-13,BigBasket,Groceries,1265,UPI
+2026-09-13,Udupi Krishna Bhavan,Food,378,UPI
+2026-09-14,Practo,Health,500,UPI
+2026-09-15,HP Petrol Pump,Transport,2000,Card
+2026-09-16,Zomato,Food,720,UPI
+2026-09-17,Uber,Transport,412,UPI
+2026-09-18,Decathlon,Shopping,2899,Card
+2026-09-19,Swiggy,Food,455,UPI
+2026-09-20,BigBasket,Groceries,2110,UPI
+2026-09-20,BookMyShow,Entertainment,720,UPI
+2026-09-21,Starbucks,Food,455,UPI
+2026-09-22,HP Petrol Pump,Transport,1800,Card
+2026-09-23,Zomato,Food,610,UPI
+2026-09-24,Uber,Transport,355,UPI
+2026-09-25,Amazon,Shopping,2499,UPI
+2026-09-26,Swiggy,Food,530,UPI
+2026-09-27,BigBasket,Groceries,1580,UPI
+2026-09-27,Myntra,Shopping,1799,Card
+2026-09-28,Udemy,Education,499,Card
+2026-09-29,Cafe Coffee Day,Food,380,UPI
+2026-09-29,Rapido,Transport,120,UPI
+2026-09-30,Zomato,Food,495,UPI
