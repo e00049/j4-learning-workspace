@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.mcp.name }}
+  labels:
+    app.kubernetes.io/name: mcp-server
+    app.kubernetes.io/part-of: wallettracker
+spec:
+  replicas: {{ .Values.mcp.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mcp-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mcp-server
+        app.kubernetes.io/part-of: wallettracker
+    spec:
+      serviceAccountName: {{ .Values.mcp.name }}
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mcp
+          image: "{{ .Values.mcp.image.repository }}:{{ .Values.mcp.image.tag }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.mcp.port }}
+          env:
+            - name: PORT
+              value: "{{ .Values.mcp.port }}"
+            - name: MCP_TRANSPORT
+              value: streamable-http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.mcp.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

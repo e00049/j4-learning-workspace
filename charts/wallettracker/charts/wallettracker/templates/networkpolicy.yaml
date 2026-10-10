@@ -1,0 +1,27 @@
+# 1) Nothing may connect to any pod in this namespace by default
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]
+---
+# 2) Only agent-api pods may reach the MCP server, only on its port
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-agent-to-mcp
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: mcp-server
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: agent-api
+      ports:
+        - protocol: TCP
+          port: {{ .Values.mcp.port }}

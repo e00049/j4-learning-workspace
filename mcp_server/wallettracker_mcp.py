@@ -2,6 +2,9 @@ import os
 from pathlib import Path
 import pandas as pd
 from mcp.server.fastmcp import FastMCP
+from starlette.requests import Request
+from starlette.responses import PlainTextResponse
+
 
 CSV = Path(__file__).resolve().parent.parent / "data" / "transactions_sep2026.csv"
 TRANSPORT = os.environ.get("MCP_TRANSPORT", "stdio")      # stdio (default) or streamable-http
@@ -40,5 +43,13 @@ def get_total_spend() -> int:
     """Total spend in INR for the user's current statement (September 2026). Use this for any 'total spend' or 'this month' question."""
     return int(df()["amount_inr"].sum())
 
+
+@mcp.custom_route("/healthz", methods=["GET"])
+async def healthz(request: Request) -> PlainTextResponse:
+    return PlainTextResponse("ok")
+
+
 if __name__ == "__main__":
     mcp.run(transport=TRANSPORT)
+
+
