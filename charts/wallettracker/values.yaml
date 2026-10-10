@@ -1,0 +1,33 @@
+mcp:
+  name: wallettracker-mcp
+  image:
+    repository: us-east4-docker.pkg.dev/nexusforge-ai-dev/wallettrackerai-05-ar/wallettracker-mcp
+    tag: v2
+  replicas: 2
+  port: 8080
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+
+agent:
+  name: agent-api
+  gsaEmail: wallettrackerai-07-agent-sa@nexusforge-ai-dev.iam.gserviceaccount.com
+  image:
+    repository: us-east4-docker.pkg.dev/nexusforge-ai-dev/wallettrackerai-05-ar/agent-api
+    tag: v1
+  replicas: 2
+  port: 8080
+  env:
+    GCP_PROJECT: nexusforge-ai-dev
+    GCP_LOCATION: us-east4
+    MODEL: gemini-2.5-flash
+    MAX_ROUNDS: "5"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
