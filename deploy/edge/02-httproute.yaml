@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: agent-api-route
+  namespace: wallettracker
+spec:
+  parentRefs:
+  - name: wallettrackerai-13-gw
+  hostnames: ["ai.mylearningworkspace.tech"]
+  rules:
+  - matches:
+    - path: {type: Exact, value: /ask}
+    - path: {type: Exact, value: /healthz}
+    backendRefs:
+    - name: agent-api
+      port: 8080

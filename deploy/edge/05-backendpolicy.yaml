@@ -1,0 +1,18 @@
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: agent-api-backend-policy
+  namespace: wallettracker
+spec:
+  default:
+    securityPolicy: wallettrackerai-14-armor
+    timeoutSec: 60
+    iap:
+      enabled: true
+      clientID: 979611062797-0j3ff32ddih2fjh0fcvebl4t2v7ioj87.apps.googleusercontent.com
+      oauth2ClientSecret:
+        name: iap-oauth-secret
+  targetRef:
+    group: ""
+    kind: Service
+    name: agent-api
