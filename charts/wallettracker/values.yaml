@@ -17,7 +17,7 @@ agent:
   gsaEmail: wallettrackerai-07-agent-sa@nexusforge-ai-dev.iam.gserviceaccount.com
   image:
     repository: us-east4-docker.pkg.dev/nexusforge-ai-dev/wallettrackerai-05-ar/agent-api
-    tag: v1
+    tag: v3
   replicas: 2
   port: 8080
   env:
@@ -25,6 +25,8 @@ agent:
     GCP_LOCATION: us-east4
     MODEL: gemini-2.5-flash
     MAX_ROUNDS: "5"
+    THINKING_BUDGET: "0"
+    PROMETHEUS_DISABLE_CREATED_SERIES: "True"
   resources:
     requests:
       cpu: 100m
