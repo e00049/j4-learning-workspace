@@ -37,7 +37,7 @@ locals {
 }
 
 resource "google_monitoring_alert_policy" "agent" {
-  for_each     = local.alerts
+  for_each     = merge(local.alerts, local.alerts_extra)
   display_name = each.key
   combiner     = "OR"
 

@@ -6,7 +6,9 @@ metadata:
     app.kubernetes.io/name: agent-api
     app.kubernetes.io/part-of: wallettracker
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.agent.replicas }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: agent-api

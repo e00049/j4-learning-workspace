@@ -1,0 +1,89 @@
+{{- if .Values.edge.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: wallettrackerai-13-gw
+  annotations:
+    networking.gke.io/certmap: {{ .Values.edge.certMapName }}
+spec:
+  gatewayClassName: gke-l7-global-external-managed
+  addresses:
+  - type: NamedAddress
+    value: {{ .Values.edge.staticIpName }}
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 443
+    allowedRoutes:
+      namespaces:
+        from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: agent-api-route
+spec:
+  parentRefs:
+  - name: wallettrackerai-13-gw
+  hostnames: [{{ .Values.edge.hostname | quote }}]
+  rules:
+  - matches:
+    - path: {type: Exact, value: /ask}
+    - path: {type: Exact, value: /healthz}
+    backendRefs:
+    - name: {{ .Values.agent.name }}
+      port: {{ .Values.agent.port }}
+---
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: agent-api-hc
+spec:
+  default:
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: {{ .Values.agent.port }}
+        requestPath: /healthz
+  targetRef:
+    group: ""
+    kind: Service
+    name: {{ .Values.agent.name }}
+---
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: agent-api-backend-policy
+spec:
+  default:
+    securityPolicy: {{ .Values.edge.securityPolicy }}
+    timeoutSec: {{ .Values.edge.timeoutSec }}
+    {{- if .Values.edge.iap.enabled }}
+    iap:
+      enabled: true
+      clientID: {{ required "edge.iap.clientId is required when IAP is enabled" .Values.edge.iap.clientId | quote }}
+      oauth2ClientSecret:
+        name: {{ .Values.edge.iap.secretName }}
+    {{- end }}
+  targetRef:
+    group: ""
+    kind: Service
+    name: {{ .Values.agent.name }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-lb-to-agent
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.agent.name }}
+  policyTypes: [Ingress]
+  ingress:
+  - from:
+    - ipBlock: {cidr: 35.191.0.0/16}
+    - ipBlock: {cidr: 130.211.0.0/22}
+    ports:
+    - port: {{ .Values.agent.port }}
+      protocol: TCP
+{{- end }}

@@ -1,0 +1,19 @@
+{{- if .Values.loadtest.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-loadgen-to-agent
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.agent.name }}
+  policyTypes: [Ingress]
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: loadgen
+    ports:
+    - port: {{ .Values.agent.port }}
+      protocol: TCP
+{{- end }}

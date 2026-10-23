@@ -17,12 +17,12 @@ agent:
   gsaEmail: wallettrackerai-07-agent-sa@nexusforge-ai-dev.iam.gserviceaccount.com
   image:
     repository: us-east4-docker.pkg.dev/nexusforge-ai-dev/wallettrackerai-05-ar/agent-api
-    tag: v3
+    tag: v4
   replicas: 2
   port: 8080
   env:
     GCP_PROJECT: nexusforge-ai-dev
-    GCP_LOCATION: us-east4
+    GCP_LOCATION: global
     MODEL: gemini-2.5-flash
     MAX_ROUNDS: "5"
     THINKING_BUDGET: "0"
@@ -33,3 +33,31 @@ agent:
       memory: 256Mi
     limits:
       memory: 512Mi
+
+# ---- Phase F: observability, scaling, load testing, public edge ----
+monitoring:
+  enabled: true
+  interval: 30s
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6                 # cap = what the Gemini quota can serve
+  targetInflightPerPod: "4"      # half of MAX_INFLIGHT=8: scale before shedding
+  targetCPUUtilization: 60
+  scaleDownStabilizationSeconds: 120
+
+loadtest:
+  enabled: false                 # --set loadtest.enabled=true only during load tests
+
+edge:
+  enabled: false                 # LB costs ~INR 50/day: enable only when needed
+  hostname: ai.mylearningworkspace.tech
+  staticIpName: wallettrackerai-08-ip
+  certMapName: wallettrackerai-11-certmap
+  securityPolicy: wallettrackerai-14-armor
+  timeoutSec: 60
+  iap:
+    enabled: true
+    clientId: ""                 # set with --set edge.iap.clientId=... (public, not a secret)
+    secretName: iap-oauth-secret # created separately with kubectl, never stored in values
