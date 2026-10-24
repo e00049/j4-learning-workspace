@@ -11,6 +11,13 @@ spec:
   minReplicas: 2
   maxReplicas: 6
   metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: prometheus.googleapis.com|agent_inflight_requests|gauge
+      target:
+        type: AverageValue
+        averageValue: "4"
   - type: Resource
     resource:
       name: cpu
