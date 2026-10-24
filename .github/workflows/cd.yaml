@@ -1,0 +1,120 @@
+name: cd-agent
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "agent_api/**"
+      - "mcp_server/**"
+      - "charts/**"
+      - "evals/**"
+      - "Dockerfile.agent"
+      - "Dockerfile.mcp"
+      - "requirements-agent.txt"
+      - "requirements-mcp.txt"
+      - ".github/workflows/cd.yaml"
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: cd-agent
+  cancel-in-progress: false      # never cancel a deploy halfway
+
+env:
+  PROJECT_ID: nexusforge-ai-dev
+  ZONE: us-east4-a
+  CLUSTER: wallettrackerai-03-gke
+  AR: us-east4-docker.pkg.dev/nexusforge-ai-dev/wallettrackerai-05-ar
+  NAMESPACE: wallettracker
+  RELEASE: wallettracker
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python syntax
+        run: python -m py_compile agent_api/app.py mcp_server/wallettracker_mcp.py evals/eval.py
+      - uses: azure/setup-helm@v4
+      - name: Helm lint + render
+        run: |
+          helm lint charts/wallettracker
+          helm template wallettracker charts/wallettracker | grep -E "^kind:" | sort | uniq -c
+      - name: Build images (no push)
+        run: |
+          docker build -f Dockerfile.mcp   -t mcp:ci .
+          docker build -f Dockerfile.agent -t agent:ci .
+
+  deploy:
+    needs: ci
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write            # lets the job request a GitHub OIDC token for WIF
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Auth to Google (WIF, no keys)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          install_components: gke-gcloud-auth-plugin
+
+      - name: Is the cluster stack up?
+        id: stack
+        run: |
+          if gcloud container clusters describe "$CLUSTER" --zone "$ZONE" --project "$PROJECT_ID" --format="value(status)" >/dev/null 2>&1; then
+            echo "up=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "up=false" >> "$GITHUB_OUTPUT"
+            echo "### ⏸️ Cluster stack is down: CI passed, deploy skipped" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Build + push images (tag = commit SHA)
+        if: steps.stack.outputs.up == 'true'
+        run: |
+          TAG="${GITHUB_SHA::7}"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          gcloud auth configure-docker us-east4-docker.pkg.dev --quiet
+          docker build -f Dockerfile.mcp   -t "$AR/wallettracker-mcp:$TAG" .
+          docker build -f Dockerfile.agent -t "$AR/agent-api:$TAG" .
+          docker push "$AR/wallettracker-mcp:$TAG"
+          docker push "$AR/agent-api:$TAG"
+
+      - uses: azure/setup-helm@v4
+        if: steps.stack.outputs.up == 'true'
+
+      - name: Deploy (helm --atomic)
+        if: steps.stack.outputs.up == 'true'
+        run: |
+          gcloud container clusters get-credentials "$CLUSTER" --zone "$ZONE" --project "$PROJECT_ID" --dns-endpoint
+          helm upgrade --install "$RELEASE" charts/wallettracker -n "$NAMESPACE" \
+            --set-string mcp.image.tag="$TAG" --set-string agent.image.tag="$TAG" \
+            --wait --atomic --timeout 5m
+          kubectl get pods -n "$NAMESPACE"
+
+      - name: Eval gate (answer key must be 5/5)
+        id: eval
+        if: steps.stack.outputs.up == 'true'
+        run: |
+          kubectl port-forward -n "$NAMESPACE" svc/agent-api 9090:8080 > pf.log 2>&1 &
+          for i in $(seq 1 20); do curl -sf localhost:9090/healthz >/dev/null && break; sleep 2; done
+          python3 evals/eval.py http://localhost:9090 | tee eval.txt
+          { echo '### 🧪 Eval'; echo '```'; cat eval.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Roll back on failed eval
+        if: failure() && steps.eval.outcome == 'failure'
+        run: |
+          helm rollback "$RELEASE" -n "$NAMESPACE" --wait
+          echo "### ⏪ Eval failed: rolled back to the previous release" >> "$GITHUB_STEP_SUMMARY"

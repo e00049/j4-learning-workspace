@@ -5,7 +5,13 @@ resource "google_container_cluster" "gke" {
   subnetwork               = google_compute_subnetwork.subnet.id
   remove_default_node_pool = true
   initial_node_count       = 1
-  deletion_protection      = false # learning project; set true in real production
+  deletion_protection      = false
+
+  control_plane_endpoints_config {
+    dns_endpoint_config {
+      allow_external_traffic = true
+    }
+  } # learning project; set true in real production
 
   release_channel {
     channel = "REGULAR"
