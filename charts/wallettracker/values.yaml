@@ -24,7 +24,7 @@ agent:
     GCP_PROJECT: nexusforge-ai-dev
     GCP_LOCATION: us-east4   # data residency default; opt in to global via --set
     MODEL: gemini-2.5-flash
-    MAX_ROUNDS: "1"
+    MAX_ROUNDS: "5"
     THINKING_BUDGET: "0"
     PROMETHEUS_DISABLE_CREATED_SERIES: "True"
   resources:

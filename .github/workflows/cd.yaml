@@ -29,9 +29,13 @@ env:
   NAMESPACE: wallettracker
   RELEASE: wallettracker
 
+defaults:
+  run:
+    shell: bash   # explicit bash = -eo pipefail: a failing eval piped to tee must fail the step
+
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -54,7 +58,7 @@ jobs:
   deploy:
     needs: ci
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       id-token: write            # lets the job request a GitHub OIDC token for WIF
